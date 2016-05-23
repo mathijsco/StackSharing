@@ -45,7 +45,7 @@ namespace StackSharing.WinApp.UI
             {
                 lblTitle.Text = "Creating share...";
                 var friendlyName = _friendlyShareName.Length > 20 ? _friendlyShareName.Substring(0, 20) : _friendlyShareName;
-                var rootFolder = await _client.CreateFolder(string.Format("Share/{0:yyyyMMddhhmmss}-{1}", DateTime.UtcNow, friendlyName), null);
+                var rootFolder = await _client.CreateFolderAsync(string.Format("Share/{0:yyyyMMddhhmmss}-{1}", DateTime.UtcNow, friendlyName), null);
 
                 var format = "Uploading file {0}/{1}...";
                 lblTitle.Text = string.Format(format, 0, _paths.Length);
@@ -75,7 +75,7 @@ namespace StackSharing.WinApp.UI
                 progressBar.Style = ProgressBarStyle.Marquee;
 
                 lblTitle.Text = "Creating share...";
-                _sharedOnlineItem = await _client.ShareItem(onlineItem);
+                _sharedOnlineItem = await _client.ShareItemAsync(onlineItem);
                 txtShareUrl.Text = _sharedOnlineItem.ShareUrl.ToString();
 
                 lblTitle.Text = "Upload completed";
@@ -150,13 +150,13 @@ namespace StackSharing.WinApp.UI
                 if (chkExpire.Checked)
                 {
                     lblTitle.Text = "Setting expiry...";
-                    await _client.SetExpiryDate(_sharedOnlineItem, DateTime.Now.AddDays(14));
+                    await _client.SetExpiryDateAsync(_sharedOnlineItem, DateTime.Now.AddDays(14));
                 }
 
                 if (!string.IsNullOrEmpty(txtPassword.Text))
                 {
                     lblTitle.Text = "Setting password...";
-                    await _client.SetPassword(_sharedOnlineItem, txtPassword.Text);
+                    await _client.SetPasswordAsync(_sharedOnlineItem, txtPassword.Text);
                 }
             }
             catch (TaskCanceledException)

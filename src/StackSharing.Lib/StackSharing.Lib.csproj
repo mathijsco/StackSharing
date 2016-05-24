@@ -64,6 +64,9 @@
   <ItemGroup>
     <Compile Include="IConnectionSettings.cs" />
     <Compile Include="Models\OnlineItem.cs" />
+    <Compile Include="Models\OwnCloud\Meta.cs" />
+    <Compile Include="Models\OwnCloud\OCS.cs" />
+    <Compile Include="Models\OwnCloud\OwnCloudResponse.cs" />
     <Compile Include="Models\SharedOnlineItem.cs" />
     <Compile Include="Models\UploadStatus.cs" />
     <Compile Include="OnlinePathBuilder.cs" />

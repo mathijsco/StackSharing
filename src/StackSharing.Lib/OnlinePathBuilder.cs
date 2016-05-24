@@ -22,7 +22,7 @@ namespace StackSharing.Lib
 
         public static OnlineItem CreateChild(OnlineItem parent, string child)
         {
-            if (string.IsNullOrEmpty(child)) throw new ArgumentException("The child cannot be null or empty.", "child");
+            if (string.IsNullOrEmpty(child)) throw new ArgumentException("The child cannot be null or empty.", nameof(child));
 
             return new OnlineItem
             {

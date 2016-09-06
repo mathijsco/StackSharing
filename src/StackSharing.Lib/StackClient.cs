@@ -28,7 +28,8 @@ namespace StackSharing.Lib
             _client = new WebDavClient(new WebDavClientParams
             {
                 Credentials = new NetworkCredential(_connectionSettings.UserName, _connectionSettings.GetPassword()),
-                UseDefaultCredentials = false
+                UseDefaultCredentials = false,
+                Timeout = TimeSpan.FromHours(1)
             });
         }
 
@@ -58,7 +59,7 @@ namespace StackSharing.Lib
                 // Create the folder
                 _cancellationToken.ThrowIfCancellationRequested();
 
-                var createResponse = await _client.Mkcol(currentChild.FullPath, new MkColParameters { CancellationToken = _cancellationToken });
+                var createResponse = await _client.Mkcol(currentChild.FullPath, new MkColParameters { CancellationToken = _cancellationToken }).ConfigureAwait(false);
                 if (createResponse.StatusCode != 201 && createResponse.StatusCode != 405) // 405 if maybe a tweak to not check if it exists?
                     throw new Exception("The folder is not created because of some unknown reason, but we got the following description back: " + createResponse.Description);
             }
@@ -119,17 +120,11 @@ namespace StackSharing.Lib
 
                 var child = OnlinePathBuilder.CreateChild(folder, Path.GetFileName(filePath));
                 var task = _client.PutFile(child.FullPath, stream, new PutFileParameters { CancellationToken = _cancellationToken });
-                try
+                do
                 {
-                    do
-                    {
-                        status.FileProgress = (float)((double)stream.Position / length);
-                    } while (!task.IsFaulted && !task.IsCanceled && !task.IsCompleted && !task.Wait(100));
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
+                    status.FileProgress = (float)((double)stream.Position / length);
+                } while (!task.IsFaulted && !task.IsCanceled && !task.IsCompleted && !task.Wait(100));
+
                 return child;
             }
         }

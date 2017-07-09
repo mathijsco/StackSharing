@@ -6,11 +6,7 @@ namespace StackSharing.Lib.Utilities
 {
     public static class ShortcutManager
     {
-        private static string ShortcutLocation
-        {
-            get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.SendTo), "Stack.lnk"); }
-        }
-
+        private static string ShortcutLocation => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.SendTo), "Stack.lnk");
 
         public static bool Exists()
         {
@@ -19,7 +15,7 @@ namespace StackSharing.Lib.Utilities
 
         public static void Create(string executablePath)
         {
-            if (Exists()) return;
+            // if (Exists()) return;
 
             // http://stackoverflow.com/questions/234231/creating-application-shortcut-in-a-directory
             Type t = Type.GetTypeFromCLSID(new Guid("72C24DD5-D70A-438B-8A42-98424B88AFB8")); //Windows Script Host Shell Object

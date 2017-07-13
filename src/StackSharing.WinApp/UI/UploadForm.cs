@@ -25,15 +25,15 @@ namespace StackSharing.WinApp.UI
         public UploadForm(AssemblyConfig config, string[] paths)
         {
             InitializeComponent();
-            this.Icon = Resources.icon;
+            Icon = Resources.icon;
 
             _friendlyShareName = paths.Length > 1 ? Path.GetFileName(Path.GetDirectoryName(paths[0])) : Path.GetFileName(paths[0]);
-            this.Text = string.Format(this.Text, _friendlyShareName);
+            Text = string.Format(Text, _friendlyShareName);
             _cancelationTokenSource = new CancellationTokenSource();
             _client = new StackClient(config, _cancelationTokenSource.Token);
             _paths = paths;
 
-            this.Load += (sender, e) => StartWork();
+            Load += (sender, e) => StartWork();
         }
 
 
@@ -60,7 +60,7 @@ namespace StackSharing.WinApp.UI
                 // Task is canceled or something, so close the UI.
                 if (!status.Task.IsCompleted)
                 {
-                    this.Close();
+                    Close();
                     return;
                 }
 
@@ -85,7 +85,7 @@ namespace StackSharing.WinApp.UI
             }
             catch (TaskCanceledException)
             {
-                this.Close();
+                Close();
             }
             catch (Exception ex)
             {
@@ -105,7 +105,7 @@ namespace StackSharing.WinApp.UI
             _cancelationTokenSource.Cancel();
 
             if (!_isUploading)
-                this.Close();
+                Close();
         }
 
         private async void btnOk_Click(object sender, EventArgs e)
@@ -131,7 +131,7 @@ namespace StackSharing.WinApp.UI
             if (!_propertiesApplied)
                 await SetShareProperties();
 
-            this.Close();
+            Close();
         }
 
         private void btnRandomPassword_Click(object sender, EventArgs e)
@@ -161,7 +161,7 @@ namespace StackSharing.WinApp.UI
             }
             catch (TaskCanceledException)
             {
-                this.Close();
+                Close();
             }
             catch (Exception ex)
             {

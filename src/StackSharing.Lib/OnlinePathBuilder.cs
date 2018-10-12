@@ -5,6 +5,8 @@ namespace StackSharing.Lib
 {
     internal static class OnlinePathBuilder
     {
+        // The base URL for all calls to the share API is: <owncloud_base_url>/ocs/v1.php/apps/files_sharing/api/v1
+        private const string BaseUrl = "ocs/v1.php/apps/files_sharing/api/v1";
         private const string RootPath = "remote.php/webdav";
 
         /// <summary>
@@ -16,13 +18,19 @@ namespace StackSharing.Lib
         public static Uri ConvertPathToFullUri(Uri host, string location)
         {
             if (location == null)
+            {
                 return new Uri(SanitizeHost(host) + RootPath, UriKind.Absolute);
+            }
+
             return new Uri(SanitizeHost(host) + RootPath + "/" + location.TrimStart('/'), UriKind.Absolute);
         }
 
         public static OnlineItem CreateChild(OnlineItem parent, string child)
         {
-            if (string.IsNullOrEmpty(child)) throw new ArgumentException("The child cannot be null or empty.", nameof(child));
+            if (string.IsNullOrEmpty(child))
+            {
+                throw new ArgumentException("The child cannot be null or empty.", nameof(child));
+            }
 
             return new OnlineItem
             {
@@ -33,17 +41,18 @@ namespace StackSharing.Lib
 
         public static Uri FileShareApi(Uri host)
         {
-            return new Uri(SanitizeHost(host) + "ocs/v1.php/apps/files_sharing/api/v1/shares?format=json", UriKind.Absolute);
+            return new Uri(SanitizeHost(host) + BaseUrl + "/shares?format=json", UriKind.Absolute);
         }
 
         public static Uri FileExpirationApi(Uri host, SharedOnlineItem sharedItem)
         {
-            return new Uri(SanitizeHost(host) + "ocs/v1.php/apps/files_sharing/api/v1/shares/" + sharedItem.ShareId + "?format=json", UriKind.Absolute);
+            return new Uri(SanitizeHost(host) + BaseUrl + "/shares/" + sharedItem.ShareId + "?format=json", UriKind.Absolute);
         }
 
         private static string SanitizeHost(Uri host)
         {
-            return host.GetLeftPart(UriPartial.Path) + "/";
+            string leftpath = host.GetLeftPart(UriPartial.Path);
+            return leftpath.EndsWith("/") ? leftpath : leftpath + "/";
         }
     }
 }

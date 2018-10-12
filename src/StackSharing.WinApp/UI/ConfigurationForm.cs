@@ -14,7 +14,7 @@ namespace StackSharing.WinApp.UI
         {
             InitializeComponent();
 
-            this.Icon = Resources.icon;
+            Icon = Resources.icon;
             _config = config;
 
             if (!_config.IsDefault)
@@ -29,7 +29,7 @@ namespace StackSharing.WinApp.UI
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
+            DialogResult = DialogResult.Cancel;
         }
 
         private void btnOk_Click(object sender, EventArgs e)
@@ -61,7 +61,7 @@ namespace StackSharing.WinApp.UI
             else if (!chkSendTo.Checked)
                 ShortcutManager.Delete();
 
-            this.DialogResult = DialogResult.OK;
+            DialogResult = DialogResult.OK;
         }
     }
 }

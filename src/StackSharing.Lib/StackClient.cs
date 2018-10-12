@@ -61,12 +61,13 @@ namespace StackSharing.Lib
 
                 var createResponse = await _client.Mkcol(currentChild.FullPath, new MkColParameters { CancellationToken = _cancellationToken }).ConfigureAwait(false);
                 if (createResponse.StatusCode != 201 && createResponse.StatusCode != 405) // 405 if maybe a tweak to not check if it exists?
-                    throw new Exception("The folder is not created because of some unknown reason, but we got the following description back: " + createResponse.Description);
+                {
+                    throw new Exception($"The folder is not created, code={createResponse.StatusCode}, description={createResponse.Description}");
+                }
             }
 
             return OnlinePathBuilder.CreateChild(parent, relativePath);
         }
-
 
         public UploadStatus UploadFiles(OnlineItem parentFolder, IList<string> filePaths)
         {
@@ -107,16 +108,14 @@ namespace StackSharing.Lib
             }
 
             // make sure to return this single file.
-            if (filePaths.Count == 1)
-                return lastItem;
-            return null;
+            return filePaths.Count == 1 ? lastItem : null;
         }
 
         private OnlineItem UploadFile(UploadStatus status, OnlineItem folder, string filePath)
         {
             using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
-                var length = stream.Length;
+                long length = stream.Length;
 
                 var child = OnlinePathBuilder.CreateChild(folder, Path.GetFileName(filePath));
                 var task = _client.PutFile(child.FullPath, stream, new PutFileParameters { CancellationToken = _cancellationToken });
@@ -131,18 +130,21 @@ namespace StackSharing.Lib
 
         public async Task<SharedOnlineItem> ShareItemAsync(OnlineItem onlineItem)
         {
-            // https://doc.owncloud.org/server/7.0/developer_manual/core/ocs-share-api.html
+            // https://doc.owncloud.org/server/10.0/developer_manual/core/ocs-share-api.html
             var keyValuePairs = new Dictionary<string, string>
             {
-                { "path", @"/\" + onlineItem.LocalPath.Replace("/", @"\") },
-                { "shareType", "3" }
+                // path - (string) path to the file/folder which should be shared
+                { "path", @"/" + onlineItem.LocalPath },
+
+                // shareType - (int) 0 = user; 1 = group; 3 = public link; 6 = federated cloud share
+                { "shareType", "3" },
+
+                // permissions - (int) 1 = read; 2 = update; 4 = create; 8 = delete; 16 = share; 31 = all (default: 31, for public shares: 1)
+                // { "permissions", "1" }
             };
 
-            var response = await PostPropertiesAsync(
-                OnlinePathBuilder.FileShareApi(_connectionSettings.StorageUri),
-                keyValuePairs
-                );
-            // {"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"id":5,"url":"https:\/\/xxxx.stackstorage.com\/index.php\/s\/abcdef","token":"abcdef"}}}
+            var response = await PostPropertiesAsync(OnlinePathBuilder.FileShareApi(_connectionSettings.StorageUri), keyValuePairs);
+            // {"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"id":2,"url":"https://???.stackstorage.com/index.php/s/M56HdvsvIAhi37Z","token":"M56HdvsvIAhi37Z","permissions":1,"expiration":""}}}
 
             dynamic data = response.OCS.Data;
             return new SharedOnlineItem(onlineItem)

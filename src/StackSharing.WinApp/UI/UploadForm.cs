@@ -75,9 +75,8 @@ namespace StackSharing.WinApp.UI
                 progressBar.Style = ProgressBarStyle.Marquee;
 
                 lblTitle.Text = "Creating share...";
-                _sharedOnlineItem = await _client.ShareItemAsync(onlineItem);
+                _sharedOnlineItem = await _client.CreateShareAsync(onlineItem);
                 txtShareUrl.Text = _sharedOnlineItem.ShareUrl.ToString();
-
                 lblTitle.Text = "Upload completed";
 
                 if (_okPressed)

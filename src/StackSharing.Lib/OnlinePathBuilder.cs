@@ -1,5 +1,7 @@
 ﻿using StackSharing.Lib.Models;
 using System;
+using System.Collections.Generic;
+using System.Web;
 
 namespace StackSharing.Lib
 {
@@ -39,12 +41,22 @@ namespace StackSharing.Lib
             };
         }
 
-        public static Uri FileShareApi(Uri host)
+        public static Uri CreateFileShareUri(Uri host, IDictionary<string, string> queryValues = null)
         {
-            return new Uri(SanitizeHost(host) + BaseUrl + "/shares?format=json", UriKind.Absolute);
+            string uri = SanitizeHost(host) + BaseUrl + "/shares?format=json";
+
+            if (queryValues != null)
+            {
+                foreach (var queryValue in queryValues)
+                {
+                    uri += $"&{queryValue.Key}={queryValue.Value}";
+                }
+            }
+
+            return new Uri(uri, UriKind.Absolute);
         }
 
-        public static Uri FileExpirationApi(Uri host, SharedOnlineItem sharedItem)
+        public static Uri CreateFileExpirationOrPasswordUri(Uri host, SharedOnlineItem sharedItem)
         {
             return new Uri(SanitizeHost(host) + BaseUrl + "/shares/" + sharedItem.ShareId + "?format=json", UriKind.Absolute);
         }

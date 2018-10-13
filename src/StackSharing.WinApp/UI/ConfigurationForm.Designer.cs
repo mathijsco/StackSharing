@@ -46,9 +46,10 @@
             this.lblTitle.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTitle.Location = new System.Drawing.Point(0, 0);
+            this.lblTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Padding = new System.Windows.Forms.Padding(10, 0, 10, 0);
-            this.lblTitle.Size = new System.Drawing.Size(355, 40);
+            this.lblTitle.Padding = new System.Windows.Forms.Padding(15, 0, 15, 0);
+            this.lblTitle.Size = new System.Drawing.Size(578, 62);
             this.lblTitle.TabIndex = 3;
             this.lblTitle.Text = "Connection settings";
             this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -56,18 +57,20 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 81);
+            this.label1.Location = new System.Drawing.Point(18, 125);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(58, 13);
+            this.label1.Size = new System.Drawing.Size(87, 20);
             this.label1.TabIndex = 5;
             this.label1.Text = "User name";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 107);
+            this.label2.Location = new System.Drawing.Point(18, 165);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(53, 13);
+            this.label2.Size = new System.Drawing.Size(78, 20);
             this.label2.TabIndex = 6;
             this.label2.Text = "Password";
             // 
@@ -75,27 +78,30 @@
             // 
             this.txtUserName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtUserName.Location = new System.Drawing.Point(100, 78);
+            this.txtUserName.Location = new System.Drawing.Point(150, 120);
+            this.txtUserName.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtUserName.Name = "txtUserName";
-            this.txtUserName.Size = new System.Drawing.Size(243, 20);
+            this.txtUserName.Size = new System.Drawing.Size(408, 26);
             this.txtUserName.TabIndex = 1;
             // 
             // txtPassword
             // 
             this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtPassword.Location = new System.Drawing.Point(100, 104);
+            this.txtPassword.Location = new System.Drawing.Point(150, 160);
+            this.txtPassword.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtPassword.Name = "txtPassword";
-            this.txtPassword.Size = new System.Drawing.Size(243, 20);
+            this.txtPassword.Size = new System.Drawing.Size(408, 26);
             this.txtPassword.TabIndex = 2;
             this.txtPassword.UseSystemPasswordChar = true;
             // 
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(187, 171);
+            this.btnOk.Location = new System.Drawing.Point(326, 290);
+            this.btnOk.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(75, 23);
+            this.btnOk.Size = new System.Drawing.Size(112, 35);
             this.btnOk.TabIndex = 3;
             this.btnOk.Text = "OK";
             this.btnOk.UseVisualStyleBackColor = true;
@@ -105,9 +111,10 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(268, 171);
+            this.btnCancel.Location = new System.Drawing.Point(448, 290);
+            this.btnCancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancel.Size = new System.Drawing.Size(112, 35);
             this.btnCancel.TabIndex = 4;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -115,27 +122,30 @@
             // 
             // txtUri
             // 
-            this.txtUri.Location = new System.Drawing.Point(100, 52);
+            this.txtUri.Location = new System.Drawing.Point(150, 80);
+            this.txtUri.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtUri.Name = "txtUri";
-            this.txtUri.Size = new System.Drawing.Size(243, 20);
+            this.txtUri.Size = new System.Drawing.Size(408, 26);
             this.txtUri.TabIndex = 0;
             this.txtUri.Text = "https://*.stackstorage.com";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 55);
+            this.label3.Location = new System.Drawing.Point(18, 85);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(49, 13);
+            this.label3.Size = new System.Drawing.Size(71, 20);
             this.label3.TabIndex = 12;
             this.label3.Text = "Stack url";
             // 
             // chkSendTo
             // 
             this.chkSendTo.AutoSize = true;
-            this.chkSendTo.Location = new System.Drawing.Point(12, 175);
+            this.chkSendTo.Location = new System.Drawing.Point(18, 269);
+            this.chkSendTo.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.chkSendTo.Name = "chkSendTo";
-            this.chkSendTo.Size = new System.Drawing.Size(140, 17);
+            this.chkSendTo.Size = new System.Drawing.Size(202, 24);
             this.chkSendTo.TabIndex = 13;
             this.chkSendTo.Text = "Add to \"Send To\" menu";
             this.chkSendTo.UseVisualStyleBackColor = true;
@@ -143,10 +153,10 @@
             // ConfigurationForm
             // 
             this.AcceptButton = this.btnOk;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(355, 206);
+            this.ClientSize = new System.Drawing.Size(578, 344);
             this.Controls.Add(this.chkSendTo);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txtUri);
@@ -158,6 +168,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblTitle);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
             this.Name = "ConfigurationForm";
             this.Text = "Stack configuration";

@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using StackSharing.Lib.Models.OwnCloud;
 using WebDav;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace StackSharing.Lib
 {
@@ -19,11 +19,13 @@ namespace StackSharing.Lib
         private readonly WebDavClient _client;
         private readonly IConnectionSettings _connectionSettings;
         private readonly CancellationToken _cancellationToken;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         public StackClient(IConnectionSettings connectionSettings, CancellationToken cancellationToken)
         {
             _connectionSettings = connectionSettings;
             _cancellationToken = cancellationToken;
+            _httpClientFactory = new HttpClientFactory(_connectionSettings);
 
             _client = new WebDavClient(new WebDavClientParams
             {
@@ -44,9 +46,11 @@ namespace StackSharing.Lib
             // Create a new root if it does not exist (this will be the /Share/Guid/ folder.
             if (parent == null)
             {
-                parent = new OnlineItem();
-                parent.LocalPath = string.Empty;
-                parent.FullPath = OnlinePathBuilder.ConvertPathToFullUri(_connectionSettings.StorageUri, null);
+                parent = new OnlineItem
+                {
+                    LocalPath = string.Empty,
+                    FullPath = OnlinePathBuilder.ConvertPathToFullUri(_connectionSettings.StorageUri, null)
+                };
             }
 
             OnlineItem currentChild = parent;
@@ -128,9 +132,14 @@ namespace StackSharing.Lib
             }
         }
 
-        public async Task<SharedOnlineItem> ShareItemAsync(OnlineItem onlineItem)
+        /// <summary>
+        /// https://doc.owncloud.org/server/10.0/developer_manual/core/ocs-share-api.html#create-a-new-share
+        /// </summary>
+        /// <param name="onlineItem">The OnlineItem.</param>
+        /// <returns>SharedOnlineItem</returns>
+        public async Task<SharedOnlineItem> CreateShareAsync(OnlineItem onlineItem)
         {
-            // https://doc.owncloud.org/server/10.0/developer_manual/core/ocs-share-api.html
+            // https://doc.owncloud.org/server/10.0/developer_manual/core/ocs-share-api.html#function-arguments
             var keyValuePairs = new Dictionary<string, string>
             {
                 // path - (string) path to the file/folder which should be shared
@@ -140,17 +149,48 @@ namespace StackSharing.Lib
                 { "shareType", "3" },
 
                 // permissions - (int) 1 = read; 2 = update; 4 = create; 8 = delete; 16 = share; 31 = all (default: 31, for public shares: 1)
-                // { "permissions", "1" }
+                { "permissions", "1" }
             };
 
-            var response = await PostPropertiesAsync(OnlinePathBuilder.FileShareApi(_connectionSettings.StorageUri), keyValuePairs);
-            // {"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"id":2,"url":"https://???.stackstorage.com/index.php/s/M56HdvsvIAhi37Z","token":"M56HdvsvIAhi37Z","permissions":1,"expiration":""}}}
+            var uri = OnlinePathBuilder.CreateFileShareUri(_connectionSettings.StorageUri);
+            await SetPropertiesAsync(uri, keyValuePairs);
+            // {"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"id":0,"url":"https://???.stackstorage.com/index.php/s/M56HdvsvIAhi37Z","token":"M56HdvsvIAhi37Z","permissions":1,"expiration":""}}}
 
-            dynamic data = response.OCS.Data;
+            // TODO : The ID is not returned anymore, always value 0 ? So we need to get all SharesAsync.
+            return await GetSharesAsync(onlineItem);
+        }
+
+        /// <summary>
+        /// https://doc.owncloud.org/server/10.0/developer_manual/core/ocs-share-api.html#get-shares-from-a-specific-file-or-folder
+        /// </summary>
+        /// <param name="onlineItem">The OnlineItem.</param>
+        /// <returns>OwnCloudResponse</returns>
+        private async Task<SharedOnlineItem> GetSharesAsync(OnlineItem onlineItem)
+        {
+            var keyValuePairs = new Dictionary<string, string>
+            {
+                // path - (string) path to the file/folder which should be shared
+                // TODO : however this does not work? No data returned, so for now, just return all shares.
+                // { "path", @"/" + onlineItem.LocalPath },
+
+                // returns not only the shares from the current user but all shares from the given file.
+                { "reshares", "true" }
+            };
+
+            var uri = OnlinePathBuilder.CreateFileShareUri(_connectionSettings.StorageUri, keyValuePairs);
+
+            HttpResponseMessage response = await _httpClientFactory.GetHttpClient().GetAsync(uri, _cancellationToken);
+
+            string content = await response.Content.ReadAsStringAsync();
+            var cloudResponse = JsonConvert.DeserializeObject<OwnCloudResponse>(content);
+            var items = (JArray)cloudResponse.OCS.Data;
+
+            var item = items.Single(d => d["path"].Value<string>() == @"/" + onlineItem.LocalPath);
+
             return new SharedOnlineItem(onlineItem)
             {
-                ShareId = (string)data.id,
-                ShareUrl = new Uri((string)data.url, UriKind.Absolute)
+                ShareId = item["id"].Value<string>(),
+                ShareUrl = new Uri(item["url"].Value<string>(), UriKind.Absolute)
             };
         }
 
@@ -161,7 +201,7 @@ namespace StackSharing.Lib
                 { "expireDate", limit.ToString("yyyy-MM-dd") }
             };
 
-            return await PostPropertiesAsync(OnlinePathBuilder.FileExpirationApi(_connectionSettings.StorageUri, onlineItem), keyValuePairs, "PUT");
+            return await UpdateShareAsync(OnlinePathBuilder.CreateFileExpirationOrPasswordUri(_connectionSettings.StorageUri, onlineItem), keyValuePairs);
             // {"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":[]}}
         }
 
@@ -172,25 +212,41 @@ namespace StackSharing.Lib
                 { "password", password }
             };
 
-            return await PostPropertiesAsync(OnlinePathBuilder.FileExpirationApi(_connectionSettings.StorageUri, onlineItem), keyValuePairs, "PUT");
+            return await UpdateShareAsync(OnlinePathBuilder.CreateFileExpirationOrPasswordUri(_connectionSettings.StorageUri, onlineItem), keyValuePairs);
             // {"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":[]}}
         }
 
-        private async Task<OwnCloudResponse> PostPropertiesAsync(Uri uri, IDictionary<string, string> content, string method = "POST")
+        private Task<OwnCloudResponse> SetPropertiesAsync(Uri uri, IDictionary<string, string> content)
         {
-            var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.Default.GetBytes($"{_connectionSettings.UserName}:{_connectionSettings.GetPassword()}")));
+            return HandlePropertiesAsync(uri, content, "POST");
+        }
 
+        /// <summary>
+        /// https://doc.owncloud.org/server/10.0/developer_manual/core/ocs-share-api.html#update-share
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        private Task<OwnCloudResponse> UpdateShareAsync(Uri uri, IDictionary<string, string> content)
+        {
+            return HandlePropertiesAsync(uri, content, "PUT");
+        }
+
+        private async Task<OwnCloudResponse> HandlePropertiesAsync(Uri uri, IDictionary<string, string> content, string method)
+        {
             var form = new FormUrlEncodedContent(content);
 
             HttpResponseMessage response;
             if (method == "POST")
-                response = await httpClient.PostAsync(uri, form, _cancellationToken);
+            {
+                response = await _httpClientFactory.GetHttpClient().PostAsync(uri, form, _cancellationToken);
+            }
             else
-                response = await httpClient.PutAsync(uri, form, _cancellationToken);
+            {
+                response = await _httpClientFactory.GetHttpClient().PutAsync(uri, form, _cancellationToken);
+            }
 
             string data = await response.Content.ReadAsStringAsync();
-
             return JsonConvert.DeserializeObject<OwnCloudResponse>(data);
         }
     }

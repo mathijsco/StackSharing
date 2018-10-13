@@ -50,6 +50,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -61,7 +62,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HttpClientFactory.cs" />
     <Compile Include="IConnectionSettings.cs" />
+    <Compile Include="IHttpClientFactory.cs" />
     <Compile Include="Models\OnlineItem.cs" />
     <Compile Include="Models\OwnCloud\Meta.cs" />
     <Compile Include="Models\OwnCloud\OCS.cs" />
